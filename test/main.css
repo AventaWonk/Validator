@@ -1,0 +1,12 @@
+form > p {
+  padding: 10px 10px 0px 10px;
+}
+
+form > p > p {
+  margin: 0;
+  color: red;
+}
+
+form label {
+  display: block;
+}
