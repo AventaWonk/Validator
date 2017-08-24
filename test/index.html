@@ -5,29 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
     <title>Simple form validator</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="main.css">
   </head>
   <body>
     <form method="post">
       <p>
         <label>Username</label>
-        <input type="text" data-vl="username" name="Username">
+        <input type="text" data-vl-rule="username" name="Username">
       </p>
       <p>
         <label>Email</label>
-        <input type="text" data-vl="email" name="Email">
+        <input type="text" data-vl-rule="email" name="Email">
       </p>
       <p>
         <label>Phone</label>
-        <input type="text" data-vl="phone" name="Phone">
+        <input type="text" data-vl-rule="phone" name="Phone">
       </p>
       <p>
         <label>Password</label>
-        <input type="password" data-vl="password" name="Password">
+        <input type="password" data-vl-rule="password" name="Password">
       </p>
       <p>
         <label>Re-enter password</label>
-        <input type="password" data-rp="Password" name="RePassword">
+        <input type="password" data-vl-repeat="Password" name="RePassword">
       </p>
       <p>
         <button type="submit">Submit</button>

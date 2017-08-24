@@ -1,15 +1,8 @@
-const Validator = {
-  showError: (node, msg) => {
-    let error = document.createElement('p');
-    error.name = "error";
-    error.innerHTML = msg;
-    node.parentNode.appendChild(error);
-  },
-
-  removeError: node => {
-    if (node.parentNode.lastChild.name == "error") {
-      node.parentNode.removeChild(node.parentNode.lastChild);
-    }
+const Conditions = {
+  checkLength: (value, minLength, maxLength) => {
+    /*
+    * @TODO
+    */
   },
 
   checkDigitsCount: (value, minCount, maxCount) => {
@@ -32,12 +25,51 @@ const Validator = {
 
     return true;
   },
+};
+
+const Validator = {
+  showError: (node, msg) => {
+    let error = document.createElement('p');
+    error.name = "error";
+    error.innerHTML = msg;
+    node.parentNode.appendChild(error);
+  },
+
+  removeError: node => {
+    if (node.parentNode.lastChild.name == "error") {
+      node.parentNode.removeChild(node.parentNode.lastChild);
+    }
+  },
+
+  checkConditions: (fields, conditions) => {
+    for (let condition in conditions) {
+      console.log(condition);
+    }
+  },
+
+  getConditions: (dataset, lexemes, baseName) => {
+    let conditions = {};
+    for (let i = 0; i < lexemes.length; i++) {
+      let lexemName = baseName + lexemes[i];
+      if (dataset[lexemName]) {
+        conditions[lexemName] = dataset[lexemName];
+      }
+    }
+
+    return conditions;
+  },
 }
 
 function SimpleValidator(rules) {
   this.rules = rules;
+  this.baseName = "vl";
+  this.lexemes = [
+    "Rule",
+    "Repeat"
+  ];
 
   this.validate = form => {
+    form.preventDefault();
     let errorFlag = false;
     let fields = form.target.elements;
 
@@ -46,22 +78,19 @@ function SimpleValidator(rules) {
         continue
       };
 
-      if (!fields[i].dataset.vl && !fields[i].dataset.rp) {
-        continue
-      };
+      let avalibleConditions = this.getConditions(fields[i].dataset, this.lexemes, this.baseName);
+      if (!avalibleConditions) {
+        continue;
+      }
 
       this.removeError(fields[i]);
-      let fieldRule = this.rules[fields[i].dataset.vl];
-      if (fieldRule && !(fields[i].value.match(fieldRule.mask) && this.checkDigitsCount(fields[i].value, fieldRule.minDigitsCount, fieldRule.maxDigitsCount))) {
-        this.showError(fields[i], fieldRule.message);
-        errorFlag = true;
+      if (!this.checkConditions(fields, avalibleConditions)) {
+        // this.showError(fields[i], fieldRule.message);
       }
 
-      let repeatFieldName = fields[i].dataset.rp;
-      if (repeatFieldName && (fields[i].value != fields[repeatFieldName].value)) {
-        this.showError(fields[i], repeatFieldName + "s must match");
-        errorFlag = true;
-      }
+      // if (!fields[i].value.match(fieldRule.mask)) {
+      //
+      // }
     }
 
     if (errorFlag) {
