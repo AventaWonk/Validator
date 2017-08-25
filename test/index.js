@@ -9,9 +9,15 @@ let rules = {
   },
   phone:  {
     mask: /(^\+\d+\(\d+\)[\d-]+$)|(^\+[\d-]+$)/,
+    length: {
+      min: 2,
+      max: 3,
+    },
+    digits: {
+      min: 5,
+      max: 12,
+    },
     message: "Enter a valid phone number. Example: +7(999)999-99-99",
-    minDigitsCount: 5,
-    maxDigitsCount: 12
   },
   password:  {
     mask: /([ -~]*([A-Z]+[ -~]*[0-9]+|[0-9]+[ -~]*[A-Z]+)[ -~]*)/,

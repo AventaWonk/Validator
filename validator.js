@@ -1,11 +1,17 @@
 const Conditions = {
-  checkLength: (value, minLength, maxLength) => {
+  checkMask: (value, mask) => {
     /*
     * @TODO
     */
   },
 
-  checkDigitsCount: (value, minCount, maxCount) => {
+  checkLength: (value, args) => {
+    /*
+    * @TODO
+    */
+  },
+
+  checkDigits: (value, args) => {
     let number;
     let count = 0;
 
@@ -15,11 +21,11 @@ const Conditions = {
       }
     }
 
-    if (minCount && count < minCount) {
+    if (args.minCount && count < args.minCount) {
       return false;
     }
 
-    if (maxCount && count > maxCount) {
+    if (args.maxCount && count > args.maxCount) {
       return false;
     }
 
@@ -41,13 +47,7 @@ const Validator = {
     }
   },
 
-  checkConditions: (fields, conditions) => {
-    for (let condition in conditions) {
-      console.log(condition);
-    }
-  },
-
-  getConditions: (dataset, lexemes, baseName) => {
+  getRuleClasses: (dataset, lexemes, baseName) => {
     let conditions = {};
     for (let i = 0; i < lexemes.length; i++) {
       let lexemName = baseName + lexemes[i];
@@ -58,6 +58,12 @@ const Validator = {
 
     return conditions;
   },
+
+  checkCondition: (value, condition) => {
+    /*
+    * @TODO
+    */
+  }
 }
 
 function SimpleValidator(rules) {
@@ -69,7 +75,6 @@ function SimpleValidator(rules) {
   ];
 
   this.validate = form => {
-    form.preventDefault();
     let errorFlag = false;
     let fields = form.target.elements;
 
@@ -78,19 +83,19 @@ function SimpleValidator(rules) {
         continue
       };
 
-      let avalibleConditions = this.getConditions(fields[i].dataset, this.lexemes, this.baseName);
-      if (!avalibleConditions) {
+      let ruleClasses = this.getRuleClasses(fields[i].dataset, this.lexemes, this.baseName);
+      if (!ruleClasses) {
         continue;
       }
 
       this.removeError(fields[i]);
-      if (!this.checkConditions(fields, avalibleConditions)) {
-        // this.showError(fields[i], fieldRule.message);
+      for (let rule in ruleClasses) {
+        for (let condition in rules[ruleClasses[rule]]) {
+          if (!this.checkCondition(fields[i].value, condition)) {
+            this.showError(fields[i], rule.message);
+          }
+        }
       }
-
-      // if (!fields[i].value.match(fieldRule.mask)) {
-      //
-      // }
     }
 
     if (errorFlag) {
