@@ -42,9 +42,12 @@ const Validator = {
     node.parentNode.appendChild(error);
   },
 
-  removeError: node => {
-    if (node.parentNode.lastChild.name == "error") {
-      node.parentNode.removeChild(node.parentNode.lastChild);
+  removeErrors: node => {
+    let currentNode = node.parentNode.lastChild;
+
+    while (currentNode.name == "error") {
+        currentNode.parentNode.removeChild(currentNode);
+        currentNode = node.parentNode.lastChild;
     }
   },
 
@@ -89,7 +92,7 @@ function SimpleValidator(rules) {
         continue;
       }
 
-      this.removeError(fields[i]);
+      this.removeErrors(fields[i]);
       for (let rule in ruleClasses) {
         let ruleError = false;
         let conditions = rules[ruleClasses[rule]];
