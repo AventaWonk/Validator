@@ -1,16 +1,18 @@
 const Conditions = {
   checkMask: (value, args) => {
-    /*
-    * @TODO
-    */
-    return false;
+    return value.match(args.reg) ? true : false;
   },
 
   checkLength: (value, args) => {
-    /*
-    * @TODO
-    */
-    return false;
+    if (args.min && value.length < args.min) {
+      return false;
+    }
+
+    if (args.max && value.length > args.max) {
+      return false;
+    }
+
+    return true;
   },
 
   checkDigits: (value, args) => {
