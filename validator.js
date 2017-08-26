@@ -1,18 +1,19 @@
 const Conditions = {
-  checkMask: (value, mask) => {
+  checkMask: (value, args) => {
     /*
     * @TODO
     */
+    return false;
   },
 
   checkLength: (value, args) => {
     /*
     * @TODO
     */
+    return false;
   },
 
   checkDigits: (value, args) => {
-    let number;
     let count = 0;
 
     for (var i = 0; i < value.length; i++) {
@@ -21,11 +22,11 @@ const Conditions = {
       }
     }
 
-    if (args.minCount && count < args.minCount) {
+    if (args.min && count < args.min) {
       return false;
     }
 
-    if (args.maxCount && count > args.maxCount) {
+    if (args.max && count > args.max) {
       return false;
     }
 
@@ -59,10 +60,9 @@ const Validator = {
     return conditions;
   },
 
-  checkCondition: (value, condition) => {
-    /*
-    * @TODO
-    */
+  checkCondition: (value, name, conditions) => {
+    let conditionMethodName = "check" + name.charAt(0).toUpperCase() + name.slice(1);
+    return Conditions[conditionMethodName](value, conditions);
   }
 }
 
@@ -75,7 +75,8 @@ function SimpleValidator(rules) {
   ];
 
   this.validate = form => {
-    let errorFlag = false;
+    form.preventDefault();
+    let errorFlag = true;
     let fields = form.target.elements;
 
     for (let i = 0; i < fields.length; i++) {
@@ -90,10 +91,24 @@ function SimpleValidator(rules) {
 
       this.removeError(fields[i]);
       for (let rule in ruleClasses) {
-        for (let condition in rules[ruleClasses[rule]]) {
-          if (!this.checkCondition(fields[i].value, condition)) {
-            this.showError(fields[i], rule.message);
+        let ruleError = false;
+        let conditions = rules[ruleClasses[rule]];
+
+        for (let condition in conditions) {
+          if (condition == "message") {
+            continue;
           }
+
+          if (!this.checkCondition(fields[i].value, condition, conditions[condition])) {
+            errorFlag = ruleError = true;
+            if (conditions[condition].message) {
+              this.showError(fields[i], conditions[condition].message);
+            }
+          }
+        }
+
+        if (ruleError && conditions && conditions.message) {
+          this.showError(fields[i], conditions.message);
         }
       }
     }
