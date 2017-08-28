@@ -1,0 +1,22 @@
+{
+  "name": "validator",
+  "version": "1.0.0",
+  "description": "Simple validator",
+  "main": "validator.js",
+  "dependencies": {
+    "jasmine": "^2.7.0"
+  },
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AventaWonk/Validator.git"
+  },
+  "author": "Roman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AventaWonk/Validator/issues"
+  },
+  "homepage": "https://github.com/AventaWonk/Validator#readme"
+}
