@@ -4,10 +4,12 @@
   "description": "Simple validator",
   "main": "validator.js",
   "dependencies": {
+    "babel-cli": "^6.26.0",
     "jasmine": "^2.7.0"
   },
   "scripts": {
-    "test": "jasmine"
+    "test": "babel-node spec/run.js",
+    "build": ""
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/AventaWonk/Validator/issues"
   },
-  "homepage": "https://github.com/AventaWonk/Validator#readme"
+  "homepage": "https://github.com/AventaWonk/Validator#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "jasmine": "^2.8.0"
+  }
 }
