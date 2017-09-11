@@ -48,35 +48,36 @@ describe("Validator test", () => {
     result = validator.getValidData(data, rules);
     expect(result).toEqual(expected);
   });
+  
 
+  it("vl-Repeat test", () => {
+    data = [
+      {
+        value: "Qwerty",
+        vlRepeat: "Username",
+      },
+      {
+        value: "Qwd",
+        vlRule: "Username",
+      },
+    ];
 
-  // it("checkLength test", () => {
-  //   data = [
-  //     {
-  //       value: "Qwerty",
-  //       vlRule: "Username",
-  //     },
-  //     {
-  //       value: "Qwe",
-  //       vlRule: "Username",
-  //     },
-  //   ];
-  //
-  //   expected = [
-  //     {
-  //       value: "Qwerty",
-  //       vlRule: "Username",
-  //     },
-  //     {
-  //       value: "Qwe",
-  //       vlRule: "Username",
-  //       invalid: true,
-  //     },
-  //   ];
-  //
-  //   validator = new Validator();
-  //   result = validator.getValidData(data, rules);
-  //   expect(result).toEqual(expected);
-  // });
+    expected = [
+      {
+        value: "Qwerty",
+        vlRepeat: "Username",
+        valid: false,
+      },
+      {
+        value: "Qwd",
+        vlRule: "Username",
+        valid: true
+      },
+    ];
+
+    let validator = new Validator();
+    result = validator.validateData(data, rules);
+    expect(result).toEqual(expected);
+  });
 
 });
