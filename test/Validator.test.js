@@ -25,59 +25,86 @@ describe("Validator test", () => {
     },
   }
 
-  it("checkLength test", () => {
-    data = [
-      {
-        value: "Qwerty",
-        vlRule: "Username",
-      },
-      {
-        value: "Qwd",
-        vlRule: "Username",
-      },
-    ];
-
-    expected = [
-      {
-        value: "Qwd",
-        vlRule: "Username",
-      }
-    ];
-
+  describe("vl-Rule test", () => {
     let validator = new Validator();
-    result = validator.getValidData(data, rules);
-    expect(result).toEqual(expected);
-  });
-  
 
-  it("vl-Repeat test", () => {
-    data = [
-      {
-        value: "Qwerty",
-        vlRepeat: "Username",
-      },
-      {
-        value: "Qwd",
-        vlRule: "Username",
-      },
-    ];
+    it("checkLength test", () => {
+      data = [
+        {
+          value: "Qwerty",
+          vlRule: "Username",
+        },
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        },
+      ];
 
-    expected = [
-      {
-        value: "Qwerty",
-        vlRepeat: "Username",
-        valid: false,
-      },
-      {
-        value: "Qwd",
-        vlRule: "Username",
-        valid: true
-      },
-    ];
+      expected = [
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        }
+      ];
 
-    let validator = new Validator();
-    result = validator.validateData(data, rules);
-    expect(result).toEqual(expected);
+      result = validator.getValidData(data, rules);
+      expect(result).toEqual(expected);
+    });
   });
 
+
+  describe("vl-Repeat test", () => {
+    let validator = new Validator();
+
+    it("checkRepeat valid test", () => {
+      data = [
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        },
+        {
+          value: "Qwd",
+          vlRepeat: "Username",
+        }
+      ];
+
+      expected = [
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        },
+        {
+          value: "Qwd",
+          vlRepeat: "Username",
+        }
+      ];
+
+      result = validator.getValidData(data, rules);
+      expect(result).toEqual(expected);
+    });
+
+    it("checkRepeat invalid test", () => {
+      data = [
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        },
+        {
+          value: "1Qwd",
+          vlRepeat: "Username",
+        },
+      ];
+
+      expected = [
+        {
+          value: "Qwd",
+          vlRule: "Username",
+        }
+      ];
+
+      result = validator.getValidData(data, rules);
+      expect(result).toEqual(expected);
+    });
+
+  });
 });
