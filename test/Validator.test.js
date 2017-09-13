@@ -47,7 +47,7 @@ describe("Validator test", () => {
         }
       ];
 
-      result = validator.getValidData(data, rules);
+      result = validator.validate(data, rules).getValid();
       expect(result).toEqual(expected);
     });
   });
@@ -79,7 +79,7 @@ describe("Validator test", () => {
         }
       ];
 
-      result = validator.getValidData(data, rules);
+      result = validator.validate(data, rules).getValid();
       expect(result).toEqual(expected);
     });
 
@@ -102,7 +102,7 @@ describe("Validator test", () => {
         }
       ];
 
-      result = validator.getValidData(data, rules);
+      result = validator.validate(data, rules).getValid();
       expect(result).toEqual(expected);
     });
 
