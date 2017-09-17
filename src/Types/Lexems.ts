@@ -3,3 +3,7 @@ export interface ILexem {
   target: string;
   hasRules: boolean;
 }
+
+export interface ILexSpace{
+  [key: string]: ILexem[];
+}
