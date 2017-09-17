@@ -3,7 +3,7 @@ import {IRules} from './Types/Rules';
 
 export default class FormParser{
   public static getData(form: HTMLFormElement): IDataField[]{
-    let formData: IDataField[];
+    let formData: IDataField[] = [];
 
     for(let i = 0; i < form.elements.length; i++) {
       if (form.elements[i].tagName != "INPUT") {

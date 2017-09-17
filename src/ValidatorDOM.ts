@@ -3,22 +3,25 @@ import {IUserRules} from './Types/Rules';
 import IValidator from './Interfaces/IValidator';
 import FormParser from './FormParser';
 
-export class ValidatorDOM {
+export default class ValidatorDOM {
   private validator: IValidator;
+  private rules: IUserRules;
 
   constructor(validator: IValidator) {
     this.validator = validator;
+    this.validateFormCallback = this.validateFormCallback.bind(this);
   }
 
-  private validateFormCallback(e: Event, rules?: IUserRules): boolean | undefined {
+  private validateFormCallback(e: Event): void {
     let formData: IDataField[] = FormParser.getData(e.target as HTMLFormElement);
-    if (!this.validator.validate(formData, rules).isValid) {
-      return false;
+    if (!this.validator.validate(formData, this.rules).isValid) {
+      e.preventDefault();
     }
   }
 
   public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules): void {
-    form.addEventListener("submit", e => this.validateFormCallback(e, rules));
+    this.rules = rules;
+    form.addEventListener("submit", this.validateFormCallback);
   }
 
   public removeValidatorFromForm(form: HTMLFormElement): void {
