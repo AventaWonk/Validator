@@ -8,6 +8,7 @@
     "jasmine": "^2.7.0"
   },
   "scripts": {
+    "run": "tsc lib/ind.ts",
     "test": "babel-node spec/run.js",
     "build": "webpack"
   },
@@ -28,6 +29,11 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-es2015": "^6.24.1",
     "jasmine": "^2.8.0",
+<<<<<<< HEAD
+=======
+    "ts-loader": "^2.3.6",
+    "typescript": "^2.5.2",
+>>>>>>> develop
     "webpack": "^3.5.5"
   }
 }
