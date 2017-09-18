@@ -25,4 +25,22 @@ export default class FormParser{
 
     return formData;
   }
+
+  public static getFieldData(input: HTMLInputElement): IDataField{
+    if (input.tagName != "INPUT") {
+        throw new Error("Critical error code: 0100");
+    }
+
+    let rules: IRules = {};
+    for (let rule in input.dataset) {
+        rules[rule] = input.dataset[rule];
+    }
+    let fieldData: IDataField = {
+      name: input.name,
+      rules: rules,
+      value: input.value,
+    };
+
+    return fieldData;
+  }
 }

@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    validator: './built/js/src/Validator.js',
-    validatorDOM: './built/js/src/ValidatorDOM.js',
-    indexTest: './built/js/src/test.js',
+    validator: './built/js/Validator.js',
+    validatorDOM: './built/js/ValidatorDOM.js',
+    indexTest: './built/js/indexTest.js',
   },
   output: {
     filename: '[name].js',

@@ -62,11 +62,11 @@ export default class Validator implements IValidator{
     let validatedData: IValidatedField[] = [];
 
     for (let i = 0; i < data.length; i++) {
-      let normalizedRules: INormalizedRules = this.getRules(data[i]); // {rule: {lexem: {...}, value: "Name"}}
+      let normalizedRules: INormalizedRules = this.getRules(data[i]);
 
       for (let ruleName in normalizedRules) {
-        let rule: INormalizedRule = normalizedRules[ruleName]; // {lexem: {...}, value: "Name"}
-        let userRule: IUserRule = userRules[rule.value]; // {...}
+        let rule: INormalizedRule = normalizedRules[ruleName];
+        let userRule: IUserRule = userRules[rule.value];
         if (!data[i].rules) {
           continue;
         }
@@ -75,9 +75,8 @@ export default class Validator implements IValidator{
           continue;
         }
 
-        let params: IDataField[] = this.getParams(data, i, rule.lexem); // [....]
-        let conditions = this.getConditions(rule, userRule, data[i]);  //
-        // let conditions = this.getConditions(rule, userRules, data[i]);  //
+        let params: IDataField[] = this.getParams(data, i, rule.lexem);
+        let conditions = this.getConditions(rule, userRule, data[i]);
 
         for (let condition in conditions) {
           let validatedField: IValidatedField = (Object as any).assign(data[i], {
@@ -89,5 +88,45 @@ export default class Validator implements IValidator{
     }
 
     return new ValidationResult(validatedData);
+  }
+
+  public validateField(currentField: IDataField, data: IDataField[], userRules: IUserRules): ValidationResult {
+    let validatedField: IValidatedField[] = [];
+    let normalizedRules: INormalizedRules = this.getRules(currentField);
+
+    for (let ruleName in normalizedRules) {
+      let rule: INormalizedRule = normalizedRules[ruleName]; // {lexem: {...}, value: "Name"}
+      let userRule: IUserRule = userRules[rule.value]; // {...}
+      if (!currentField.rules) {
+        continue;
+      }
+      if (rule.lexem.hasRules && !userRule) {
+        console.error("Forgot set " + rule.lexem.name + "?");
+        continue;
+      }
+
+      let params: IDataField[] = [];
+      params.push(currentField);
+      // let params: IDataField[] = this.getParams(data, i, rule.lexem); // [....]
+      
+      let conditions = this.getConditions(rule, userRule, currentField);  //
+      let messages: string[] = [];
+      let validationFlag: boolean = true;
+      for (let condition in conditions) {
+        if (!this.checkCondition(params, condition, conditions[condition])) {
+          validationFlag = false;
+          if (conditions[condition].message) {
+            messages.push(conditions[condition].message);
+          }
+        }
+      }
+
+      validatedField.push((Object as any).assign(currentField, {
+        isValid: validationFlag,
+        messages: messages,
+      }));
+    }
+
+    return new ValidationResult(validatedField);
   }
 }

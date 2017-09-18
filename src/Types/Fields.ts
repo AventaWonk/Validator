@@ -8,4 +8,5 @@ export interface IDataField {
 
 export interface IValidatedField extends IDataField {
   isValid: boolean,
+  messages: string[],
 }
