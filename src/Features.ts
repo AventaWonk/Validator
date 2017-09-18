@@ -1,13 +1,4 @@
 export default class Features {
-<<<<<<< HEAD:lib/Features.js
-  static checkRepeat(data, args) {
-    return data.some(field => {
-      return field.vlRule == args.ruleParam && field.value == args.value;
-    });
-  }
-
-  static checkMask(value, args) {
-=======
   // static checkRepeat(data: any, args: any) {
   //   return data.some(field => {
   //     return field.vlRule == args.ruleParam && field.value == args.value;
@@ -15,7 +6,6 @@ export default class Features {
   // }
 
   static checkMask(value: string, args: any): boolean {
->>>>>>> develop:src/Features.ts
     return value.match(args.reg) ? true : false;
   }
 
