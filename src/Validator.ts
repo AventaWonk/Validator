@@ -95,9 +95,9 @@ export default class Validator implements IValidator{
     let normalizedRules: INormalizedRules = this.getRules(currentField);
 
     for (let ruleName in normalizedRules) {
-      let rule: INormalizedRule = normalizedRules[ruleName]; // {lexem: {...}, value: "Name"}
-      let userRule: IUserRule = userRules[rule.value]; // {...}
-      if (!currentField.rules) {
+      let rule: INormalizedRule = normalizedRules[ruleName];
+      let userRule: IUserRule = userRules[rule.value];
+      if (Object.keys(currentField.rules).length == 0) {
         continue;
       }
       if (rule.lexem.hasRules && !userRule) {
@@ -108,8 +108,8 @@ export default class Validator implements IValidator{
       let params: IDataField[] = [];
       params.push(currentField);
       // let params: IDataField[] = this.getParams(data, i, rule.lexem); // [....]
-      
-      let conditions = this.getConditions(rule, userRule, currentField);  //
+
+      let conditions = this.getConditions(rule, userRule, currentField);  
       let messages: string[] = [];
       let validationFlag: boolean = true;
       for (let condition in conditions) {
