@@ -2,7 +2,7 @@ import {IDataField} from './Types/Fields';
 import {IRules} from './Types/Rules';
 
 export default class FormParser{
-  public static getData(form: HTMLFormElement): IDataField[]{
+  public static getFormData(form: HTMLFormElement, currentInput?: HTMLInputElement): IDataField[]{
     let formData: IDataField[] = [];
 
     for(let i = 0; i < form.elements.length; i++) {
@@ -19,28 +19,11 @@ export default class FormParser{
         name:  input.name,
         value: input.value,
         rules: rules,
+        isCurrent: form.elements[i] == currentInput,
       };
       formData.push(data);
     }
 
     return formData;
-  }
-
-  public static getFieldData(input: HTMLInputElement): IDataField{
-    if (input.tagName != "INPUT") {
-        throw new Error("Critical error code: 0100");
-    }
-
-    let rules: IRules = {};
-    for (let rule in input.dataset) {
-        rules[rule] = input.dataset[rule];
-    }
-    let fieldData: IDataField = {
-      name: input.name,
-      rules: rules,
-      value: input.value,
-    };
-
-    return fieldData;
   }
 }

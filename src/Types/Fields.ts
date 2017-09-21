@@ -4,9 +4,15 @@ export interface IDataField {
   name: string,
   value: string,
   rules: IRules | null,
+  isCurrent: boolean;
 }
 
 export interface IValidatedField extends IDataField {
   isValid: boolean,
   messages: string[],
 }
+
+// export interface IFormFields {
+//   current: IDataField,
+//   other: IDataField[]
+// }

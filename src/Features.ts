@@ -6,7 +6,7 @@ export default class Features {
   // }
 
   static checkMask(value: string, args: any): boolean {
-    return value.match(args.reg) ? true : false;
+    return !!value.match(args.reg);
   }
 
   static checkLength(value: string, args: any): boolean  {
@@ -14,17 +14,13 @@ export default class Features {
       return false;
     }
 
-    if (args.max && value.length > args.max) {
-      return false;
-    }
-
-    return true;
+    return args.max && value.length > args.max
   }
 
   static checkDigits(value: string, args: any): boolean  {
     let count = 0;
 
-    for (var i = 0; i < value.length; i++) {
+    for (let i = 0; i < value.length; i++) {
       if (parseInt(value[i], 10)) {
         count++;
       }
@@ -34,10 +30,6 @@ export default class Features {
       return false;
     }
 
-    if (args.max && count > args.max) {
-      return false;
-    }
-
-    return true;
+    return args.max && count > args.max
   }
 }

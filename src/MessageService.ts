@@ -2,11 +2,6 @@ import IMessageService from './Interfaces/IMessageService';
 
 export default class MessageService implements IMessageService {
   public showMessages(input: HTMLInputElement, messageArray: string[]) {
-    let msg: HTMLDivElement = input.parentNode.lastChild as HTMLDivElement;
-    if (msg.dataset.msgInfo) {
-      input.parentNode.removeChild(msg);
-    }
-
     let div: HTMLDivElement = document.createElement('div');
     div.dataset.msgInfo = "1";
     for (let i = 0; i < messageArray.length; i++) {
@@ -17,5 +12,12 @@ export default class MessageService implements IMessageService {
       div.appendChild(p);
     }
     input.parentNode.appendChild(div);
+  }
+
+  public deleteMessages(input: HTMLInputElement) {
+    let msg: HTMLDivElement = input.parentNode.lastChild as HTMLDivElement;
+    if (msg.dataset.msgInfo) {
+      input.parentNode.removeChild(msg);
+    }
   }
 }

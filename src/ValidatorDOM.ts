@@ -1,45 +1,58 @@
 import {IDataField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
-import IValidator from './Interfaces/IValidator';
+import IValidationService from './Interfaces/IValidationService';
 import IMessageService from './Interfaces/IMessageService';
+import Validator from './Validator';
 import FormParser from './FormParser';
 
 export default class ValidatorDOM {
-  private validator: IValidator;
+  private validator: Validator;
   private messageService: IMessageService;
+  private form: HTMLFormElement;
   private rules: IUserRules;
 
-  constructor(validator: IValidator, MessageService: IMessageService) {
-    this.validator = validator;
+  constructor(validationService: IValidationService, MessageService: IMessageService) {
+    this.validator = new Validator(validationService);
+    this.messageService = MessageService;
     this.validateFormCallback = this.validateFormCallback.bind(this);
     this.validateFieldCallback = this.validateFieldCallback.bind(this);
-    this.messageService = MessageService;
   }
 
-  private validateFormCallback(e: Event): void {
-    let formData: IDataField[] = FormParser.getData(e.target as HTMLFormElement);
-    let vResult = this.validator.validate(formData, this.rules);
+  // private changeFormValidity(): void {
+  //   if (this.validateFormCallback && this.isValid) {
+  //     this.validateFormCallback();
+  //   } else if (this.validateFormCallback && !this.isValid) {
+  //     this.validateFormCallback();
+  //   }
+  // }
 
-    if (!vResult.isValid) {
-      e.preventDefault();
-    }
+  private validateFormCallback(e: Event): void {
+    let formData: IDataField[] = FormParser.getFormData(e.target as HTMLFormElement);
+
+    // let vResult = this.validator.validateAll(formData, this.rules);
+    // if (!vResult.isValid) {
+    //   e.preventDefault();
+    // }
   }
 
   private validateFieldCallback(e: Event): void {
-    let fieldData: IDataField = FormParser.getFieldData(e.target as HTMLInputElement);
-    // let formData: IDataField[] = FormParser.getData(e.target as HTMLFormElement);
-    let vResult = this.validator.validateField(fieldData, {} as IDataField[], this.rules);
+    let formData: IDataField[] = FormParser.getFormData(this.form, e.target as HTMLInputElement);
 
-    if (vResult.getAll().length > 0 && vResult.getAll()[0].messages) {
-      this.messageService.showMessages(e.target as HTMLInputElement, vResult.getAll()[0].messages);
+    let result = this.validator.validateOne(formData, this.rules);
+    if (result && !result.isValid) {
+      this.messageService.deleteMessages(e.target as HTMLInputElement);
+      this.messageService.showMessages(e.target as HTMLInputElement, result.messages);
+    } else {
+      this.messageService.deleteMessages(e.target as HTMLInputElement);
     }
   }
 
   private setFieldValidation(form: HTMLFormElement) {
-    form.addEventListener("keypress", this.validateFieldCallback);
+    form.addEventListener("input", this.validateFieldCallback);
   }
 
-  public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules): void {
+  public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules, onFormIsValid?: Function, onFormIsNotValid?: Function): void {
+    this.form = form;
     this.rules = rules;
     this.setFieldValidation(form);
     form.addEventListener("submit", this.validateFormCallback);
