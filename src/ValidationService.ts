@@ -6,11 +6,11 @@ import {IDataField, IValidatedField} from './Types/Fields';
 import {IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
 
 export default class Validator implements IValidationService{
-  private static getParams(data: IDataField[], index: number, lexem: ILexem) {
+  private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
     switch (lexem.target) {
       case "self":
         let params: IDataField[] = [];
-        params.push(data[index]);
+        params.push(current);
         return params;
       case "all":
         return data;
@@ -19,19 +19,19 @@ export default class Validator implements IValidationService{
     }
   }
 
-  private static getConditions(currentRule: INormalizedRule, userRule: IUserRule, data: IDataField): IUserRules {
-    if (currentRule.lexem.hasRules) {
-      return userRule;
+  private static getUserRules(rule: INormalizedRule, userRules: IUserRules, normalizedRules: IUserRule, ruleName: string, currentField: IDataField): IUserRules {
+    switch (rule.lexem.hasRules) {
+      case true:
+        return normalizedRules[ruleName];
+      case false:
+        let userRule: IUserRule = {};
+        let normalizedRuleName = ruleName.charAt(0).toLowerCase() + ruleName.slice(1);
+        userRule[normalizedRuleName] = {
+          currentField: currentField,
+          value: normalizedRules[ruleName].value,
+        };
+        return userRule;
     }
-    // } else {
-    //   let conditions: IUserRules = {};
-    //   let featureName = currentRule.lexem.name.charAt(0).toLowerCase() + currentRule.lexem.name.slice(1);
-    //   conditions[featureName] = {
-    //     ruleParam: data.,
-    //     value: data.value,
-    //   };
-    //  return conditions;
-    // }
   }
 
   private static getRules(data: IDataField): INormalizedRules {
@@ -53,37 +53,35 @@ export default class Validator implements IValidationService{
 
   private static checkCondition(data: IDataField[], name: string, conditions: IUserRule): boolean {
     let conditionMethodName = "check" + name.charAt(0).toUpperCase() + name.slice(1);
-
-     return (Features as any)[conditionMethodName](data[0].value, conditions);
+    //@TODO switchData()
+    return (Features as any)[conditionMethodName](data[0].value, conditions);
   }
 
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedField {
+    if (Object.keys(currentField.rules).length == 0) {
+      return null;
+    }
+
     let validatedField: IValidatedField;
     let normalizedRules: INormalizedRules = Validator.getRules(currentField);
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
-      let userRule: IUserRule = userRules[rule.value];
-      if (Object.keys(currentField.rules).length == 0) {
-        return null;
-      }
-      if (rule.lexem.hasRules && !userRule) {
+      let userRule: IUserRule = Validator.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
+
+      if (!userRule) {
         console.error("Forgot set " + rule.lexem.name + "?");
         return null;
       }
 
-      let params: IDataField[] = [];
-      params.push(currentField);
-      // let params: IDataField[] = this.getParams(data, i, rule.lexem); // [....]
-
-      let conditions = Validator.getConditions(rule, userRule, currentField);
+      let params: IDataField[] = Validator.getParams(currentField, allFields, rule.lexem);
       let messages: string[] = [];
       let validationFlag: boolean = true;
-      for (let condition in conditions) {
-        if (!Validator.checkCondition(params, condition, conditions[condition])) {
+      for (let condition in userRule) {
+        if (!Validator.checkCondition(params, condition, userRule[condition])) {
           validationFlag = false;
-          if (conditions[condition].message) {
-            messages.push(conditions[condition].message);
+          if (userRule[condition].message) {
+            messages.push(userRule[condition].message);
           }
         }
       }
