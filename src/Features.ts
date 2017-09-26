@@ -1,9 +1,9 @@
 export default class Features {
-  // static checkRepeat(data: any, args: any) {
-  //   return data.some(field => {
-  //     return field.vlRule == args.ruleParam && field.value == args.value;
-  //   });
-  // }
+  static checkRepeat(data: any, args: any): boolean {
+    return data.some((field: any) => {
+      return field.name == args.value && field.value == args.currentField.value;
+    });
+  }
 
   static checkMask(value: string, args: any): boolean {
     return !!value.match(args.reg);

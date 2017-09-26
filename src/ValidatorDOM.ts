@@ -2,6 +2,7 @@ import {IDataField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
 import IValidationService from './Interfaces/IValidationService';
 import IMessageService from './Interfaces/IMessageService';
+import ValidationResult from './ValidationResult';
 import Validator from './Validator';
 import FormParser from './FormParser';
 
@@ -29,10 +30,10 @@ export default class ValidatorDOM {
   private validateFormCallback(e: Event): void {
     let formData: IDataField[] = FormParser.getFormData(e.target as HTMLFormElement);
 
-    // let vResult = this.validator.validateAll(formData, this.rules);
-    // if (!vResult.isValid) {
-    //   e.preventDefault();
-    // }
+    let validationResult = new ValidationResult(this.validator.validateAll(formData, this.rules));
+    if (!validationResult.isValid) {
+      e.preventDefault();
+    }
   }
 
   private validateFieldCallback(e: Event): void {

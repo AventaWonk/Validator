@@ -22,7 +22,7 @@ export default class Validator implements IValidationService{
   private static getUserRules(rule: INormalizedRule, userRules: IUserRules, normalizedRules: IUserRule, ruleName: string, currentField: IDataField): IUserRules {
     switch (rule.lexem.hasRules) {
       case true:
-        return normalizedRules[ruleName];
+        return userRules[rule.value];
       case false:
         let userRule: IUserRule = {};
         let normalizedRuleName = ruleName.charAt(0).toLowerCase() + ruleName.slice(1);
@@ -52,9 +52,17 @@ export default class Validator implements IValidationService{
   }
 
   private static checkCondition(data: IDataField[], name: string, conditions: IUserRule): boolean {
-    let conditionMethodName = "check" + name.charAt(0).toUpperCase() + name.slice(1);
-    //@TODO switchData()
-    return (Features as any)[conditionMethodName](data[0].value, conditions);
+    try {
+      let conditionMethodName = "check" + name.charAt(0).toUpperCase() + name.slice(1);
+      
+      if (data.length == 1) {
+        return (Features as any)[conditionMethodName](data[0].value, conditions);
+      }
+
+      return (Features as any)[conditionMethodName](data, conditions);
+    } catch (e) {
+      console.error(e.message);
+    }
   }
 
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedField {
