@@ -53,13 +53,13 @@ export default class Validator implements IValidationService{
 
   private static checkCondition(data: IDataField[], name: string, conditions: IUserRule): boolean {
     try {
-      let conditionMethodName = "check" + name.charAt(0).toUpperCase() + name.slice(1);
-      
+      let conditionMethodName: string = "check" + name.charAt(0).toUpperCase() + name.slice(1);
+      let func: Function  = (Features as any)[conditionMethodName];
       if (data.length == 1) {
-        return (Features as any)[conditionMethodName](data[0].value, conditions);
+        return func(data[0].value, conditions);
       }
 
-      return (Features as any)[conditionMethodName](data, conditions);
+      return func(data, conditions);
     } catch (e) {
       console.error(e.message);
     }

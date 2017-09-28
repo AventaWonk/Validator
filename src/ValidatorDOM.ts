@@ -2,6 +2,7 @@ import {IDataField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
 import IValidationService from './Interfaces/IValidationService';
 import IMessageService from './Interfaces/IMessageService';
+import IValidatorParams from './Interfaces/IValidatorParams';
 import ValidationResult from './ValidationResult';
 import Validator from './Validator';
 import FormParser from './FormParser';
@@ -11,6 +12,7 @@ export default class ValidatorDOM {
   private messageService: IMessageService;
   private form: HTMLFormElement;
   private rules: IUserRules;
+  private validatorParams: IValidatorParams;
 
   constructor(validationService: IValidationService, MessageService: IMessageService) {
     this.validator = new Validator(validationService);
@@ -43,8 +45,10 @@ export default class ValidatorDOM {
     if (result && !result.isValid) {
       this.messageService.deleteMessages(e.target as HTMLInputElement);
       this.messageService.showMessages(e.target as HTMLInputElement, result.messages);
+      this.validatorParams.onFieldIsNotValid(e.target);
     } else {
       this.messageService.deleteMessages(e.target as HTMLInputElement);
+      this.validatorParams.onFieldIsValid(e.target);
     }
   }
 
@@ -52,11 +56,12 @@ export default class ValidatorDOM {
     form.addEventListener("input", this.validateFieldCallback);
   }
 
-  public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules, onFormIsValid?: Function, onFormIsNotValid?: Function): void {
+  public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules, callbacks?: IValidatorParams): void {
     this.form = form;
     this.rules = rules;
     this.setFieldValidation(form);
     form.addEventListener("submit", this.validateFormCallback);
+    this.validatorParams = callbacks;
   }
 
   public removeValidatorFromForm(form: HTMLFormElement): void {
