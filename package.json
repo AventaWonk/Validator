@@ -4,13 +4,12 @@
   "description": "Simple validator",
   "main": "validator.js",
   "dependencies": {
-    "babel-cli": "^6.26.0",
+    "@types/jasmine": "^2.6.0",
     "jasmine": "^2.7.0"
   },
   "scripts": {
-    "run": "tsc lib/ind.ts",
-    "test": "babel-node spec/run.js",
-    "build": "webpack"
+    "test": "jasmine",
+    "build": "webpack -p"
   },
   "repository": {
     "type": "git",
@@ -23,12 +22,9 @@
   },
   "homepage": "https://github.com/AventaWonk/Validator#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.0",
+    "awesome-typescript-loader": "^3.2.3",
     "jasmine": "^2.8.0",
-    "ts-loader": "^2.3.6",
+    "source-map-loader": "^0.2.2",
     "typescript": "^2.5.2",
     "webpack": "^3.5.5"
   }

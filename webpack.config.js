@@ -1,31 +1,32 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
   entry: {
-    validator: './built/js/Validator.js',
-    validatorDOM: './built/js/ValidatorDOM.js',
-    indexTest: './built/js/indexTest.js',
+    validator: './src/Validator.ts',
+    validatorDOM: './src/ValidatorDOM.ts',
+    dev: './dev/index.ts',
   },
+  target: "node",
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, './built/dist/')
   },
+  plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin()
+  ],
+  devtool: "source-map",
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /(node_modules)/,
-        use: [
-          'babel-loader'
-        ]
-      },
-      {
         test: /\.ts$/,
         exclude: /(node_modules)/,
-        use: [
-          'ts-loader'
-        ]
-      }
+        use: 'awesome-typescript-loader'
+      },
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
     ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.json']
   }
 };

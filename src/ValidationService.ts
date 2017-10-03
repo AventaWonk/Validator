@@ -5,7 +5,7 @@ import {ILexem} from './Types/Lexems';
 import {IDataField, IValidatedField} from './Types/Fields';
 import {IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
 
-export default class Validator implements IValidationService{
+export default class ValidationService implements IValidationService{
   private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
     switch (lexem.target) {
       case "self":
@@ -71,22 +71,22 @@ export default class Validator implements IValidationService{
     }
 
     let validatedField: IValidatedField;
-    let normalizedRules: INormalizedRules = Validator.getRules(currentField);
+    let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
-      let userRule: IUserRule = Validator.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
+      let userRule: IUserRule = ValidationService.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
 
       if (!userRule) {
         console.error("Forgot set " + rule.lexem.name + "?");
         return null;
       }
 
-      let params: IDataField[] = Validator.getParams(currentField, allFields, rule.lexem);
+      let params: IDataField[] = ValidationService.getParams(currentField, allFields, rule.lexem);
       let messages: string[] = [];
       let validationFlag: boolean = true;
       for (let condition in userRule) {
-        if (!Validator.checkCondition(params, condition, userRule[condition])) {
+        if (!ValidationService.checkCondition(params, condition, userRule[condition])) {
           validationFlag = false;
           if (userRule[condition].message) {
             messages.push(userRule[condition].message);
