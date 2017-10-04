@@ -8,7 +8,7 @@
     "jasmine": "^2.7.0"
   },
   "scripts": {
-    "test": "jasmine",
+    "test": "jasmine-ts",
     "build": "webpack -p"
   },
   "repository": {
@@ -24,6 +24,7 @@
   "devDependencies": {
     "awesome-typescript-loader": "^3.2.3",
     "jasmine": "^2.8.0",
+    "jasmine-ts": "^0.2.1",
     "source-map-loader": "^0.2.2",
     "typescript": "^2.5.2",
     "webpack": "^3.5.5"
