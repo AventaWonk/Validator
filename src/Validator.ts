@@ -1,4 +1,4 @@
-import {IDataField, IValidatedField} from './Types/Fields';
+import {IDataField, IValidatedDataField, IValidatedField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
 import IValidationService from './Interfaces/IValidationService'
 
@@ -17,20 +17,22 @@ export default class Validator {
     }
   }
 
-  public validateOne(data: IDataField[], rules: IUserRules): IValidatedField {
-    return this.validationService.validateField(Validator.getCurrentField(data), data, rules);
+  public validateOne(data: IDataField[], rules: IUserRules): IValidatedDataField {
+    let currentField: IDataField = Validator.getCurrentField(data);
+
+    return this.validationService.validateField(currentField, data, rules);
   }
 
-  public validateAll(data: IDataField[], rules: IUserRules): IValidatedField[] {
-    let validatedData: IValidatedField[] = [];
-
-    for (let i = 0; i < data.length; i++) {
-      validatedData.push(
-        this.validationService.validateField(Validator.getCurrentField(data), data, rules)
-      );
-    }
-
-    return validatedData;
-  }
+  // public validateAll(data: IDataField[], rules: IUserRules): IValidatedField[] {
+  //   let validatedData: IValidatedField[] = [];
+  //
+  //   for (let i = 0; i < data.length; i++) {
+  //     validatedData.push(
+  //       this.validationService.validateField(Validator.getCurrentField(data), data, rules)
+  //     );
+  //   }
+  //
+  //   return validatedData;
+  // }
 
 }

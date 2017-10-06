@@ -12,6 +12,11 @@ export interface IValidatedField extends IDataField {
   messages: string[],
 }
 
+export interface IValidatedDataField {
+  isValid: boolean,
+  messages: string[],
+}
+
 // export interface IFormFields {
 //   current: IDataField,
 //   other: IDataField[]

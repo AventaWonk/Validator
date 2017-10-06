@@ -2,10 +2,10 @@ import Features from './Features';
 import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService';
 import {ILexem} from './Types/Lexems';
-import {IDataField, IValidatedField} from './Types/Fields';
+import {IDataField, IValidatedField, IValidatedDataField} from './Types/Fields';
 import {IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
 
-export default class ValidationService implements IValidationService{
+export default class ValidationService implements IValidationService {
   private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
     switch (lexem.target) {
       case "self":
@@ -65,41 +65,41 @@ export default class ValidationService implements IValidationService{
     }
   }
 
-  public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedField {
+  public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedDataField {
     if (Object.keys(currentField.rules).length == 0) {
       return null;
     }
 
-    let validatedField: IValidatedField;
     let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
+    let validationFlag: boolean = true;
+    let messages: string[] = [];
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
       let userRule: IUserRule = ValidationService.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
 
       if (!userRule) {
-        console.error("Forgot set " + rule.lexem.name + "?");
-        return null;
+        throw new Error("Forgot set " + rule.lexem.name + "?")
       }
 
       let params: IDataField[] = ValidationService.getParams(currentField, allFields, rule.lexem);
-      let messages: string[] = [];
-      let validationFlag: boolean = true;
-      for (let condition in userRule) {
-        if (!ValidationService.checkCondition(params, condition, userRule[condition])) {
-          validationFlag = false;
-          if (userRule[condition].message) {
-            messages.push(userRule[condition].message);
-          }
-        }
-      }
 
-      validatedField = (Object as any).assign(currentField, {
-        isValid: validationFlag,
-        messages: messages,
-      });
+      for (let condition in userRule) {
+        if (ValidationService.checkCondition(params, condition, userRule[condition])) {
+          continue;
+        }
+
+        if (userRule[condition].message) {
+          messages.push(userRule[condition].message);
+        }
+
+        validationFlag = false;
+      }
     }
 
-    return validatedField;
+    return {
+      isValid: validationFlag,
+      messages: messages,
+    };
   }
 }

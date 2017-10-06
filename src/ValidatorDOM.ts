@@ -32,10 +32,10 @@ export default class ValidatorDOM {
   private validateFormCallback(e: Event): void {
     let formData: IDataField[] = FormParser.getFormData(e.target as HTMLFormElement);
 
-    let validationResult = new ValidationResult(this.validator.validateAll(formData, this.rules));
-    if (!validationResult.isValid) {
-      e.preventDefault();
-    }
+    // let validationResult = new ValidationResult(this.validator.validateAll(formData, this.rules));
+    // if (!validationResult.isValid) {
+    //   e.preventDefault();
+    // }
   }
 
   private validateFieldCallback(e: Event): void {
