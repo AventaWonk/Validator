@@ -1,7 +1,8 @@
-import {IDataField, IValidatedField} from '../src/Types/Fields';
+import {IDataField, IValidatedField, IValidatedDataField} from '../src/Types/Fields';
 import ValidationService from '../src/ValidationService';
 
 describe("Validation service test", () => {
+  let vs = new ValidationService();
   let userRules = {
     name: {
       mask: {
@@ -32,28 +33,69 @@ describe("Validation service test", () => {
   let data: IDataField[] = [
     {
       name: "name",
-      value: "1",
+      value: "",
       rules: {
         vlRule: "name",
+      },
+      isCurrent: true,
+    },
+    {
+      name: "email",
+      value: "",
+      rules: {
+        vlRule: "email",
+      },
+      isCurrent: true,
+    },
+    {
+      name: "phone",
+      value: "",
+      rules: {
+        vlRule: "phone",
+      },
+      isCurrent: true,
+    },
+    {
+      name: "password",
+      value: "",
+      rules: {
+        vlRule: "password",
       },
       isCurrent: true,
     }
   ];
 
-  it("validates field with invalid value", () => {
-    let vs = new ValidationService();
+  it("validates field with invalid (length = 0) value without errors", () => {
     let result = vs.validateField(data[0], data, userRules)
-    let expected: IValidatedField = {
-      name: "name",
-      value: "1",
-      rules: {
-        vlRule: "name",
-      },
-      isCurrent: true,
+    let expected: IValidatedDataField = {
       isValid: false,
       messages: [
         "Username should be longer than 3 characters and must consists of latin letters, numbers, underscores and dashes"
-      ]
+      ],
+    }
+
+    expect(result).toEqual(expected);
+  });
+
+  it("validates field with invalid value", () => {
+    data[0].value = "--";
+    let result = vs.validateField(data[0], data, userRules)
+    let expected: IValidatedDataField = {
+      isValid: false,
+      messages: [
+        "Username should be longer than 3 characters and must consists of latin letters, numbers, underscores and dashes"
+      ],
+    }
+
+    expect(result).toEqual(expected);
+  });
+
+  it("validates field with valid value", () => {
+    data[0].value = "123";
+    let result = vs.validateField(data[0], data, userRules)
+    let expected: IValidatedDataField = {
+      isValid: true,
+      messages: [],
     }
 
     expect(result).toEqual(expected);
