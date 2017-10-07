@@ -7,14 +7,19 @@ import ValidationResult from './ValidationResult';
 import Validator from './Validator';
 import FormParser from './FormParser';
 
+interface InvolvedForm {
+  formLink: HTMLFormElement,
+  rules: IUserRules,
+  callbacks: IValidatorParams,
+}
+
 export default class ValidatorDOM {
   private validator: Validator;
   private messageService: IMessageService;
-  private form: HTMLFormElement;
-  private rules: IUserRules;
-  private validatorParams: IValidatorParams;
+  private forms: { [key: string]: InvolvedForm } = {};
+  private static count: number = 0;
 
-  constructor(validationService: IValidationService, MessageService: IMessageService) {
+  constructor(validationService: IValidationService, MessageService?: IMessageService) {
     this.validator = new Validator(validationService);
     this.messageService = MessageService;
     this.validateFormCallback = this.validateFormCallback.bind(this);
@@ -38,33 +43,44 @@ export default class ValidatorDOM {
     // }
   }
 
-  private validateFieldCallback(e: Event): void {
-    let formData: IDataField[] = FormParser.getFormData(this.form, e.target as HTMLInputElement);
+  private validateFieldCallback(e: Event, id: string): void {
+    let currentForm: InvolvedForm = this.forms[id];
+    let formData: IDataField[] = FormParser.getFormData(currentForm.formLink, e.target as HTMLInputElement);
+    let result = this.validator.validateOne(formData, currentForm.rules);
 
-    let result = this.validator.validateOne(formData, this.rules);
+    if (!this.messageService) {
+      return;
+    }
+
     if (result && !result.isValid) {
       this.messageService.deleteMessages(e.target as HTMLInputElement);
       this.messageService.showMessages(e.target as HTMLInputElement, result.messages);
-      this.validatorParams.onFieldIsNotValid(e.target);
+      if (currentForm.callbacks && currentForm.callbacks.onFieldIsNotValid) {
+        currentForm.callbacks.onFieldIsNotValid(e.target);
+      }
     } else {
       this.messageService.deleteMessages(e.target as HTMLInputElement);
-      this.validatorParams.onFieldIsValid(e.target);
+      if (currentForm.callbacks && currentForm.callbacks.onFieldIsValid) {
+        currentForm.callbacks.onFieldIsValid(e.target);
+      }
     }
   }
 
-  private setFieldValidation(form: HTMLFormElement) {
-    form.addEventListener("input", this.validateFieldCallback);
-  }
-
   public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules, callbacks?: IValidatorParams): void {
-    this.form = form;
-    this.rules = rules;
-    this.setFieldValidation(form);
+    form.dataset.id = ValidatorDOM.count.toString();
+    this.forms[form.dataset.id] = {
+      formLink: form,
+      rules: rules,
+      callbacks: callbacks,
+    };
+    ValidatorDOM.count++;
+
+    form.addEventListener("input", (e) => this.validateFieldCallback(e, form.dataset.id));
     form.addEventListener("submit", this.validateFormCallback);
-    this.validatorParams = callbacks;
   }
 
   public removeValidatorFromForm(form: HTMLFormElement): void {
     form.removeEventListener("submit", this.validateFormCallback);
+    delete this.forms[form.data.id];
   }
 }
