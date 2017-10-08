@@ -20,7 +20,12 @@ export default class Validator {
   public validateOne(data: IDataField[], rules: IUserRules): IValidatedDataField {
     let currentField: IDataField = Validator.getCurrentField(data);
 
-    return this.validationService.validateField(currentField, data, rules);
+    try {
+      return this.validationService.validateField(currentField, data, rules);
+    } catch (e) {
+      console.error(e.message);
+      throw new Error("Validation failed");
+    }
   }
 
   // public validateAll(data: IDataField[], rules: IUserRules): IValidatedField[] {

@@ -14,7 +14,11 @@ export default class Features {
       return false;
     }
 
-    return args.max && value.length > args.max
+    if (args.max && value.length > args.max) {
+      return false;
+    }
+
+    return true;
   }
 
   static checkDigits(value: string, args: any): boolean  {
@@ -30,6 +34,10 @@ export default class Features {
       return false;
     }
 
-    return args.max && count > args.max
+    if (args.max && count > args.max) {
+      return false;
+    }
+
+    return true;
   }
 }

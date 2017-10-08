@@ -45,24 +45,29 @@ export default class ValidatorDOM {
 
   private validateFieldCallback(e: Event, id: string): void {
     let currentForm: InvolvedForm = this.forms[id];
-    let formData: IDataField[] = FormParser.getFormData(currentForm.formLink, e.target as HTMLInputElement);
-    let result = this.validator.validateOne(formData, currentForm.rules);
 
-    if (!this.messageService) {
-      return;
-    }
+    try {
+      let formData: IDataField[] = FormParser.getFormData(currentForm.formLink, e.target as HTMLInputElement);
+      let result = this.validator.validateOne(formData, currentForm.rules);
 
-    if (result && !result.isValid) {
-      this.messageService.deleteMessages(e.target as HTMLInputElement);
-      this.messageService.showMessages(e.target as HTMLInputElement, result.messages);
-      if (currentForm.callbacks && currentForm.callbacks.onFieldIsNotValid) {
-        currentForm.callbacks.onFieldIsNotValid(e.target);
+      if (result.isValid) {
+        if (this.messageService) {
+          this.messageService.deleteMessages(e.target as HTMLInputElement);
+        }
+        if (currentForm.callbacks && currentForm.callbacks.onFieldIsValid) {
+          currentForm.callbacks.onFieldIsValid(e.target);
+        }
+      } else {
+        if (this.messageService) {
+          this.messageService.deleteMessages(e.target as HTMLInputElement);
+          this.messageService.showMessages(e.target as HTMLInputElement, result.messages);
+        }
+        if (currentForm.callbacks && currentForm.callbacks.onFieldIsNotValid) {
+          currentForm.callbacks.onFieldIsNotValid(e.target);
+        }
       }
-    } else {
-      this.messageService.deleteMessages(e.target as HTMLInputElement);
-      if (currentForm.callbacks && currentForm.callbacks.onFieldIsValid) {
-        currentForm.callbacks.onFieldIsValid(e.target);
-      }
+    } catch (e) {
+      console.error(e.message);
     }
   }
 
