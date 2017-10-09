@@ -66,10 +66,6 @@ export default class ValidationService implements IValidationService {
   }
 
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedDataField {
-    if (Object.keys(currentField.rules).length == 0) {
-      return null;
-    }
-
     let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
     let validationFlag: boolean = true;
     let messages: string[] = [];
