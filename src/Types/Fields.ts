@@ -4,7 +4,6 @@ export interface IDataField {
   name: string,
   value: string,
   rules: IRules | null,
-  isCurrent: boolean;
 }
 
 export interface IValidatedField extends IDataField {

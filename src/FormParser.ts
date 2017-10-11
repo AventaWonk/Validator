@@ -4,15 +4,12 @@ import {IRules} from './Types/Rules';
 export default class FormParser {
   private form: HTMLFormElement;
   private virtualForm: any;
-  private onInput: Function;
+  private lastUpdated: IDataField;
   private static counter: number = 0;
 
-  constructor (form: HTMLFormElement, onInput: Function) {
+  constructor (form: HTMLFormElement) {
     this.form = form;
-    this.onInput = onInput;
     this.initializeVirtualForm(form);
-    this.onInputCallback = this.onInputCallback.bind(this);
-    this.form.addEventListener("input", this.onInputCallback);
   }
 
   public getFormData(): IDataField[] {
@@ -22,7 +19,15 @@ export default class FormParser {
       formData.push(this.virtualForm[id]);
     }
 
-    return this.virtualForm;
+    return formData;
+  }
+
+  public updateFormData(input: HTMLInputElement): void {
+    this.lastUpdated = this.updateVirtualForm(input);
+  }
+
+  public getLastUpdatedFieldData(): IDataField {
+    return this.lastUpdated;
   }
 
   private initializeVirtualForm(form: HTMLFormElement): void {
@@ -60,11 +65,6 @@ export default class FormParser {
     return this.virtualForm[inputId];
   }
 
-  private onInputCallback(e: Event): void {
-    let inputData: IDataField = this.updateVirtualForm(e.target as HTMLInputElement);
-    this.onInput(inputData, this.getFormData(), e);
-  }
-
   private getElementId(element: HTMLElement): string {
     return element.dataset.id;
   }
@@ -86,9 +86,17 @@ export default class FormParser {
 
       let input: HTMLInputElement = form.elements[i] as HTMLInputElement;
       let rules: IRules = {};
+      let rulesCount: number = 0;
+
       for (let rule in input.dataset) {
           rules[rule] = input.dataset[rule];
+          rulesCount++;
       }
+
+      if (rulesCount == 0) {
+        rules = null;
+      }
+
       let data: any = {
         input: input,
         rules: rules

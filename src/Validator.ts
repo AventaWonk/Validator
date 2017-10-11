@@ -9,17 +9,7 @@ export default class Validator {
     this.validationService = validationService;
   }
 
-  private static getCurrentField(fieldsArray: IDataField[]): IDataField {
-    for (let i = 0; i < fieldsArray.length; i++) {
-      if (fieldsArray[i].isCurrent) {
-        return fieldsArray[i];
-      }
-    }
-  }
-
-  public validateOne(data: IDataField[], rules: IUserRules): IValidatedDataField {
-    let currentField: IDataField = Validator.getCurrentField(data);
-
+  public validateOne(currentField: IDataField, data: IDataField[], rules: IUserRules): IValidatedDataField {
     try {
       return this.validationService.validateField(currentField, data, rules);
     } catch (e) {
@@ -28,16 +18,24 @@ export default class Validator {
     }
   }
 
-  // public validateAll(data: IDataField[], rules: IUserRules): IValidatedField[] {
-  //   let validatedData: IValidatedField[] = [];
-  //
-  //   for (let i = 0; i < data.length; i++) {
-  //     validatedData.push(
-  //       this.validationService.validateField(Validator.getCurrentField(data), data, rules)
-  //     );
-  //   }
-  //
-  //   return validatedData;
-  // }
+  public validateAll(data: IDataField[], rules: IUserRules): IValidatedDataField[] {
+    let validatedData: IValidatedDataField[] = [];
 
+    try {
+      for (let i = 0; i < data.length; i++) {
+        if (!data[i].rules) {
+          continue;
+        }
+
+        validatedData.push(
+          this.validationService.validateField(data[i], data, rules)
+        );
+      }
+    } catch (e) {
+      console.error(e.message);
+      throw new Error("Validation failed");
+    }
+
+    return validatedData;
+  }
 }
