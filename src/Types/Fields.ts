@@ -13,7 +13,7 @@ export interface IValidatedField extends IDataField {
 
 export interface IValidatedDataField {
   isValid: boolean,
-  messages: string[],
+  rules: any,
 }
 
 // export interface IFormFields {

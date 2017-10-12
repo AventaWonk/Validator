@@ -11,10 +11,11 @@ describe("Validation service test", () => {
       }
     },
     email:  {
-      mask: {
-        reg: /^[0-9a-z-_.]+@\w{2,}\.[a-z\.]{2,6}$/,
+      digits: {
+        min: 2,
+        max: 2,
         message: "Enter a valid email address"
-    }
+     }
     },
     phone:  {
       mask: {
@@ -36,32 +37,28 @@ describe("Validation service test", () => {
       value: "",
       rules: {
         vlRule: "name",
-      },
-      isCurrent: true,
+      }
     },
     {
       name: "email",
       value: "",
       rules: {
         vlRule: "email",
-      },
-      isCurrent: true,
+      }
     },
     {
       name: "phone",
       value: "",
       rules: {
         vlRule: "phone",
-      },
-      isCurrent: true,
+      }
     },
     {
       name: "password",
       value: "",
       rules: {
         vlRule: "password",
-      },
-      isCurrent: true,
+      }
     }
   ];
 
@@ -69,9 +66,11 @@ describe("Validation service test", () => {
     let result = vs.validateField(data[0], data, userRules)
     let expected: IValidatedDataField = {
       isValid: false,
-      messages: [
-        "Username should be longer than 3 characters and must consists of latin letters, numbers, underscores and dashes"
-      ],
+      rules: {
+        vlRule: {
+          mask: false
+        }
+      },
     }
 
     expect(result).toEqual(expected);
@@ -82,9 +81,11 @@ describe("Validation service test", () => {
     let result = vs.validateField(data[0], data, userRules)
     let expected: IValidatedDataField = {
       isValid: false,
-      messages: [
-        "Username should be longer than 3 characters and must consists of latin letters, numbers, underscores and dashes"
-      ],
+      rules: {
+        vlRule: {
+          mask: false
+        }
+      },
     }
 
     expect(result).toEqual(expected);
@@ -95,7 +96,49 @@ describe("Validation service test", () => {
     let result = vs.validateField(data[0], data, userRules)
     let expected: IValidatedDataField = {
       isValid: true,
-      messages: [],
+      rules: null,
+    }
+
+    expect(result).toEqual(expected);
+  });
+
+
+
+  it("validates field with another condition and invalid (length = 0) value without errors", () => {
+    let result = vs.validateField(data[1], data, userRules)
+    let expected: IValidatedDataField = {
+      isValid: false,
+      rules: {
+        vlRule: {
+          mask: false
+        }
+      },
+    }
+
+    expect(result).toEqual(expected);
+  });
+
+  it("validates field with another condition and  valid value", () => {
+    data[1].value = "12";
+    let result = vs.validateField(data[1], data, userRules)
+    let expected: IValidatedDataField = {
+      isValid: true,
+      rules: null,
+    }
+
+    expect(result).toEqual(expected);
+  });
+
+  it("validates field with another condition and  invalid value", () => {
+    data[1].value = "1";
+    let result = vs.validateField(data[1], data, userRules)
+    let expected: IValidatedDataField = {
+      isValid: false,
+      rules: {
+        vlRule: {
+          mask: false
+        }
+      },
     }
 
     expect(result).toEqual(expected);

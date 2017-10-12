@@ -3,7 +3,7 @@ import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService';
 import {ILexem} from './Types/Lexems';
 import {IDataField, IValidatedField, IValidatedDataField} from './Types/Fields';
-import {IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
+import {IUserRule, IRules, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
 
 export default class ValidationService implements IValidationService {
   private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
@@ -68,7 +68,7 @@ export default class ValidationService implements IValidationService {
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedDataField {
     let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
     let validationFlag: boolean = true;
-    let messages: string[] = [];
+    let rules: IRules = {};
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
@@ -79,23 +79,26 @@ export default class ValidationService implements IValidationService {
       }
 
       let params: IDataField[] = ValidationService.getParams(currentField, allFields, rule.lexem);
+      let conditions: any = {};
 
       for (let condition in userRule) {
-        if (ValidationService.checkCondition(params, condition, userRule[condition])) {
-          continue;
+        let validationResult = ValidationService.checkCondition(params, condition, userRule[condition]);
+        if (! validationResult) {
+          validationFlag = false;
         }
 
-        if (userRule[condition].message) {
-          messages.push(userRule[condition].message);
-        }
-
-        validationFlag = false;
+        conditions[condition] = validationResult;
       }
+      rules["vl" + ruleName] = conditions;
+    }
+
+    if (validationFlag) {
+      rules = null;
     }
 
     return {
       isValid: validationFlag,
-      messages: messages,
+      rules: rules,
     };
   }
 }
