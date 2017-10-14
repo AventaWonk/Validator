@@ -2,7 +2,7 @@ import {IDataField} from './Types/Fields';
 import {IRules} from './Types/Rules';
 
 export default class FormParser {
-  private static getFormInputs(form: HTMLFormElement): any {
+  public static getFormInputs(form: HTMLFormElement): HTMLInputElement[] {
     let inputs: HTMLInputElement[] = [];
 
     for(let i = 0; i < form.elements.length; i++) {
@@ -16,7 +16,7 @@ export default class FormParser {
     return inputs;
   }
 
-  private static getInputRules(input: HTMLInputElement): any {
+  public static getInputRules(input: HTMLInputElement): IRules {
     let rules: IRules = {};
     let rulesCount: number = 0;
 

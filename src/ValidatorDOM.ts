@@ -3,14 +3,14 @@ import {IUserRules} from './Types/Rules';
 import IValidationService from './Interfaces/IValidationService';
 import IMessageService from './Interfaces/IMessageService';
 import IValidatorParams from './Interfaces/IValidatorParams';
-import ValidationResult from './ValidationResult';
 import Validator from './Validator';
 import FormParser from './FormParser';
+import VirtualForm from './VirtualForm';
 
 interface InvolvedForm {
   formLink: HTMLFormElement,
-  formParserLink: FormParser,
-  rules: IUserRules,
+  virtualForm: VirtualForm,
+  userRules: IUserRules,
   callbacks: IValidatorParams,
 }
 
@@ -35,27 +35,28 @@ export default class ValidatorDOM {
 
     let id = (e.currentTarget as HTMLFormElement).dataset.id;
     let currentForm: InvolvedForm = this.forms[id];
-    let formParser: FormParser = currentForm.formParserLink;
-
-    formParser.updateFormData(e.target as HTMLInputElement);
-    let fieldData: IDataField = formParser.getLastUpdatedFieldData()
-    let formData: IDataField[] = formParser.getFormData();
+    let fieldData: IDataField = currentForm.virtualForm.getVirtualFieldData(e.target as HTMLInputElement);
+    let formData: IDataField[] = currentForm.virtualForm.getVirtualFormData();
 
     if (!fieldData.rules) {
       return;
     }
 
     try {
-      let result: IValidatedDataField = this.validator.validateOne(fieldData, formData, currentForm.rules);
+      let result: IValidatedDataField = this.validator.validateOne(fieldData, formData, currentForm.userRules);
+      let previousValidity: boolean = currentForm.virtualForm.getVirtualFieldValidity(e.target as HTMLInputElement);
 
+      if (result.isValid == previousValidity ) {
+        return;
+      }
+      currentForm.virtualForm.updateVirtualFieldValidity(e.target as HTMLInputElement, result.isValid);
       if (this.messageService) {
-        this.messageService.updateMessages(e.target as HTMLInputElement, result.messages)
+        // this.messageService.updateMessages(e.target as HTMLInputElement, result.messages)
       }
 
       if (!currentForm.callbacks) {
         return;
       }
-
       if (result.isValid && currentForm.callbacks.onFieldIsValid) {
         currentForm.callbacks.onFieldIsValid(e.target, e.currentTarget);
       } else if (!result.isValid && currentForm.callbacks.onFieldIsNotValid) {
@@ -68,45 +69,19 @@ export default class ValidatorDOM {
 
   private onSubmitCallback(e: Event): void {
     let id = (e.currentTarget as HTMLFormElement).dataset.id;
-    let currentForm: InvolvedForm = this.forms[id];
-    let formParser: FormParser = currentForm.formParserLink;
 
-    try {
-      let results: IValidatedDataField[] = this.validator.validateAll(formParser.getFormData(), currentForm.rules);
-      let formIsValid: boolean = true;
-
-      for (let i = 0; i < results.length; i++) {
-        // this.messageService.updateMessages(results[i].input, results[i].messages);
-
-        if (!results[i].isValid) {
-          formIsValid = false;
-        }
-      }
-
-      if (formIsValid) {
-        if (currentForm.callbacks && currentForm.callbacks.onFormIsValid) {
-          currentForm.callbacks.onFormIsValid();
-        }
-      } else {
-        if (currentForm.callbacks && currentForm.callbacks.onFormIsNotValid) {
-          currentForm.callbacks.onFormIsNotValid();
-        }
-
-        e.preventDefault();
-      }
-    } catch (e2) {
+    if (!this.forms[id].virtualForm.isValid) {
       e.preventDefault();
-      console.error(e2.message);
     }
   }
 
-  public setValidatorOnForm(form: HTMLFormElement, rules: IUserRules, callbacks?: IValidatorParams): void {
+  public setValidatorOnForm(form: HTMLFormElement, userRules: IUserRules, callbacks?: IValidatorParams): void {
     form.dataset.id = ValidatorDOM.count.toString();
 
     this.forms[form.dataset.id] = {
       formLink: form,
-      formParserLink: new FormParser(form),
-      rules: rules,
+      virtualForm: new VirtualForm(FormParser.getFormInputs(form)),
+      userRules: userRules,
       callbacks: callbacks,
     };
     ValidatorDOM.count++;

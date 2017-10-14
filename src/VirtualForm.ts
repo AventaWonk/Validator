@@ -1,31 +1,26 @@
 import {IDataField} from './Types/Fields';
 import {IRules} from './Types/Rules';
+import FormParser from './FormParser';
 
 interface virtualField {
   inputLink: HTMLInputElement;
-  value: string;
-  isValid: boolean;
-  // rules: IRules;
+  dataRules?: IRules;
+  isValid?: boolean;
 }
 
 export default class VirtualForm {
-  // private formLink: HTMLFormElement;
   private fields: { [key: string]: virtualField } = {};
   private lastUpdatedField: virtualField;
   private static counter: number = 0;
 
   constructor(inputs: HTMLInputElement[]) {
-    // this.formLink = form;
-
     for (let i = 0; i < inputs.length; i++) {
       let id: string = this.setElementId(inputs[i]);
       let currentInput = inputs[i];
 
       this.fields[id] = {
         inputLink: currentInput,
-        value: currentInput.value,
-        isValid: false,
-        // rules: currentInput.dataset.rules;
+        dataRules: FormParser.getInputRules(currentInput),
       }
     }
   }
@@ -41,43 +36,69 @@ export default class VirtualForm {
     return id;
   }
 
-  public updateField(input: HTMLInputElement) {
-    let inputId: string = this.getElementId(input);
+  private updateVirtualForm(input: HTMLInputElement): string {
+    let id: string = this.setElementId(input);
 
-    if (!inputId) {
-      inputId = this.setElementId(input);
-
-      this.fields[inputId] = {
-        inputLink: input,
-        value: input.value,
-        isValid: false,
-      }
-    } else {
-      this.fields[inputId].value = input.value;
+    this.fields[id] = {
+      inputLink: input,
+      isValid: false,
+      dataRules: FormParser.getInputRules(input),
     }
 
-    return this.fields[inputId];
+    return id;
   }
 
-  public updateAllFields(inputs: HTMLInputElement[]) {
-
-  }
-
-  public getLastUpdatedField(): virtualField {
-    return this.lastUpdatedField;
-  }
-
-  public getFormData(): IDataField[] {
+  public getVirtualFormData(): IDataField[] {
     let formData: IDataField[] = [];
 
     for (let id in this.fields) {
       formData.push({
         name: this.fields[id].inputLink.name,
-        value: this.fields[id].value,
-        rules: null,
+        value: this.fields[id].inputLink.value,
+        rules: this.fields[id].dataRules,
       });
     }
 
     return formData;
+  }
+
+  public updateVirtualFieldValidity(input: HTMLInputElement, validity: boolean) {
+    let id: string = this.getElementId(input);
+
+    this.fields[id].isValid = validity;
+  }
+
+  public getVirtualFieldValidity(input: HTMLInputElement): boolean {
+    let id: string = this.getElementId(input);
+
+    if (!id) {
+      id = this.updateVirtualForm(input);
+    }
+
+    return this.fields[id].isValid;
+  }
+
+  public getVirtualFieldData(input: HTMLInputElement): IDataField {
+    let id: string = this.getElementId(input);
+
+    if (!id) {
+      id = this.updateVirtualForm(input);
+    }
+
+    return {
+      name: this.fields[id].inputLink.name,
+      value: this.fields[id].inputLink.value,
+      rules: this.fields[id].dataRules,
+    };
+  }
+
+  public get isValid(): boolean {
+    for (let id in this.fields) {
+      if (!this.fields[id].isValid) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
