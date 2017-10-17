@@ -20,9 +20,4 @@ export default class MessageService implements IMessageService {
       input.parentNode.removeChild(msg);
     }
   }
-
-  public updateMessages(input: HTMLInputElement, messages: string[]) {
-    this.deleteMessages(input);
-    this.showMessages(input, messages);
-  }
 }

@@ -1,5 +1,4 @@
-import {IDataField} from './Types/Fields';
-import {IRules} from './Types/Rules';
+import {IFieldRules} from './Types/Rules';
 
 export default class FormParser {
   public static getFormInputs(form: HTMLFormElement): HTMLInputElement[] {
@@ -16,8 +15,8 @@ export default class FormParser {
     return inputs;
   }
 
-  public static getInputRules(input: HTMLInputElement): IRules {
-    let rules: IRules = {};
+  public static getInputRules(input: HTMLInputElement): IFieldRules {
+    let rules: IFieldRules = {};
     let rulesCount: number = 0;
 
     for (let rule in input.dataset) {

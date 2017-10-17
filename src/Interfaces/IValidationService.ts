@@ -1,4 +1,4 @@
-import {IDataField, IValidatedField, IValidatedDataField} from '../Types/Fields';
+import {IDataField, IValidatedDataField} from '../Types/Fields';
 import {IUserRules} from '../Types/Rules';
 
 export default interface IValidator {

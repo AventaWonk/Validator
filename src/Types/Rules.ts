@@ -1,6 +1,6 @@
 import {ILexem} from './Lexems';
 
-export interface IRules {
+export interface IFieldRules {
   [key: string]: string;
 }
 

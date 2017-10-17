@@ -1,22 +1,14 @@
-import {IRules} from './Rules';
+import {IFieldRules} from './Rules';
 
 export interface IDataField {
   name: string,
   value: string,
-  rules: IRules | null,
-}
-
-export interface IValidatedField extends IDataField {
-  isValid: boolean,
-  messages: string[],
+  fieldRules: IFieldRules,
 }
 
 export interface IValidatedDataField {
-  isValid: boolean,
-  rules: any,
+  name: string,
+  value: string,
+  validatedRules: any,
+  isValid: boolean
 }
-
-// export interface IFormFields {
-//   current: IDataField,
-//   other: IDataField[]
-// }

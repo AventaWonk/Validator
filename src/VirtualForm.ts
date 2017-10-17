@@ -1,35 +1,34 @@
 import {IDataField} from './Types/Fields';
-import {IRules} from './Types/Rules';
+import {IFieldRules} from './Types/Rules';
 import FormParser from './FormParser';
 
 interface virtualField {
   inputLink: HTMLInputElement;
-  dataRules?: IRules;
+  fieldRules?: IFieldRules;
   isValid?: boolean;
 }
 
 export default class VirtualForm {
   private fields: { [key: string]: virtualField } = {};
-  private lastUpdatedField: virtualField;
   private static counter: number = 0;
 
   constructor(inputs: HTMLInputElement[]) {
     for (let i = 0; i < inputs.length; i++) {
-      let id: string = this.setElementId(inputs[i]);
+      let id: string = VirtualForm.setElementId(inputs[i]);
       let currentInput = inputs[i];
 
       this.fields[id] = {
         inputLink: currentInput,
-        dataRules: FormParser.getInputRules(currentInput),
+        fieldRules: FormParser.getInputRules(currentInput),
       }
     }
   }
 
-  private getElementId(element: HTMLElement): string {
+  private static getElementId(element: HTMLElement): string {
     return element.dataset.id;
   }
 
-  private setElementId(element: HTMLElement): string {
+  private static setElementId(element: HTMLElement): string {
     let id: string = VirtualForm.counter.toString();
     element.dataset.id = id;
     VirtualForm.counter++;
@@ -37,13 +36,13 @@ export default class VirtualForm {
   }
 
   private updateVirtualForm(input: HTMLInputElement): string {
-    let id: string = this.setElementId(input);
+    let id: string = VirtualForm.setElementId(input);
 
     this.fields[id] = {
       inputLink: input,
       isValid: false,
-      dataRules: FormParser.getInputRules(input),
-    }
+      fieldRules: FormParser.getInputRules(input),
+    };
 
     return id;
   }
@@ -55,7 +54,7 @@ export default class VirtualForm {
       formData.push({
         name: this.fields[id].inputLink.name,
         value: this.fields[id].inputLink.value,
-        rules: this.fields[id].dataRules,
+        fieldRules: this.fields[id].fieldRules,
       });
     }
 
@@ -63,13 +62,13 @@ export default class VirtualForm {
   }
 
   public updateVirtualFieldValidity(input: HTMLInputElement, validity: boolean) {
-    let id: string = this.getElementId(input);
+    let id: string = VirtualForm.getElementId(input);
 
     this.fields[id].isValid = validity;
   }
 
   public getVirtualFieldValidity(input: HTMLInputElement): boolean {
-    let id: string = this.getElementId(input);
+    let id: string = VirtualForm.getElementId(input);
 
     if (!id) {
       id = this.updateVirtualForm(input);
@@ -79,7 +78,7 @@ export default class VirtualForm {
   }
 
   public getVirtualFieldData(input: HTMLInputElement): IDataField {
-    let id: string = this.getElementId(input);
+    let id: string = VirtualForm.getElementId(input);
 
     if (!id) {
       id = this.updateVirtualForm(input);
@@ -88,7 +87,7 @@ export default class VirtualForm {
     return {
       name: this.fields[id].inputLink.name,
       value: this.fields[id].inputLink.value,
-      rules: this.fields[id].dataRules,
+      fieldRules: this.fields[id].fieldRules,
     };
   }
 

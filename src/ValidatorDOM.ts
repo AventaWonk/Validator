@@ -38,7 +38,7 @@ export default class ValidatorDOM {
     let fieldData: IDataField = currentForm.virtualForm.getVirtualFieldData(e.target as HTMLInputElement);
     let formData: IDataField[] = currentForm.virtualForm.getVirtualFormData();
 
-    if (!fieldData.rules) {
+    if (!fieldData.fieldRules) {
       return;
     }
 
@@ -51,7 +51,8 @@ export default class ValidatorDOM {
       }
       currentForm.virtualForm.updateVirtualFieldValidity(e.target as HTMLInputElement, result.isValid);
       if (this.messageService) {
-        // this.messageService.updateMessages(e.target as HTMLInputElement, result.messages)
+        // this.messageService.updateMessages(e.target as HTMLInputElement, result.messages);
+
       }
 
       if (!currentForm.callbacks) {

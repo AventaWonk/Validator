@@ -2,8 +2,8 @@ import Features from './Features';
 import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService';
 import {ILexem} from './Types/Lexems';
-import {IDataField, IValidatedField, IValidatedDataField} from './Types/Fields';
-import {IUserRule, IRules, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
+import {IDataField, IValidatedDataField} from './Types/Fields';
+import {IFieldRules, IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
 
 export default class ValidationService implements IValidationService {
   private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
@@ -40,10 +40,10 @@ export default class ValidationService implements IValidationService {
 
     for (let i = 0; i < lexSpace[base].length; i++) {
       let lexem: string = base + lexSpace[base][i].name.charAt(0).toUpperCase() + lexSpace[base][i].name.slice(1);
-      if (data.rules[lexem]) {
+      if (data.fieldRules[lexem]) {
        normalizedRules[lexSpace[base][i].name] = {
          lexem: lexSpace[base][i],
-         value: data.rules[lexem],
+         value: data.fieldRules[lexem],
        };
       }
     }
@@ -68,14 +68,14 @@ export default class ValidationService implements IValidationService {
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedDataField {
     let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
     let validationFlag: boolean = true;
-    let rules: IRules = {};
+    let validatedRules: IFieldRules = {};
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
       let userRule: IUserRule = ValidationService.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
 
       if (!userRule) {
-        throw new Error("Forgot set " + rule.lexem.name + "?")
+        throw new Error("Forgot set " + rule.lexem.name + "?");
       }
 
       let params: IDataField[] = ValidationService.getParams(currentField, allFields, rule.lexem);
@@ -89,16 +89,18 @@ export default class ValidationService implements IValidationService {
 
         conditions[condition] = validationResult;
       }
-      rules["vl" + ruleName] = conditions;
+      validatedRules["vl" + ruleName] = conditions;
     }
 
     if (validationFlag) {
-      rules = null;
+      validatedRules = null;
     }
 
     return {
-      isValid: validationFlag,
-      rules: rules,
-    };
+      name: currentField.name,
+      value: currentField.value,
+      validatedRules: validatedRules,
+      isValid: validationFlag
+    }
   }
 }

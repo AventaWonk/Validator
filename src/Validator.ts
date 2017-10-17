@@ -1,4 +1,4 @@
-import {IDataField, IValidatedDataField, IValidatedField} from './Types/Fields';
+import {IDataField, IValidatedDataField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
 import IValidationService from './Interfaces/IValidationService'
 
@@ -23,7 +23,7 @@ export default class Validator {
 
     try {
       for (let i = 0; i < data.length; i++) {
-        if (!data[i].rules) {
+        if (!data[i].fieldRules) {
           continue;
         }
 
