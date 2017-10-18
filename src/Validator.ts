@@ -1,5 +1,6 @@
 import {IDataField, IValidatedDataField} from './Types/Fields';
 import {IUserRules} from './Types/Rules';
+import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService'
 
 export default class Validator {
@@ -37,5 +38,15 @@ export default class Validator {
     }
 
     return validatedData;
+  }
+
+  public static getValidatorPrefixes(): string[] {
+    let prefixes: string[] = [];
+
+    for (let prefix in lexSpace) {
+      prefixes.push(prefix);
+    }
+
+    return prefixes;
   }
 }

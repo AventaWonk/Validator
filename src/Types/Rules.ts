@@ -20,3 +20,7 @@ export interface INormalizedRule {
 export interface INormalizedRules {
   [key: string]: INormalizedRule;
 }
+
+export interface IValidatedRules {
+  [key: string]: IUserRules;
+}

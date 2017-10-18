@@ -3,7 +3,7 @@ import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService';
 import {ILexem} from './Types/Lexems';
 import {IDataField, IValidatedDataField} from './Types/Fields';
-import {IFieldRules, IUserRule, IUserRules, INormalizedRule, INormalizedRules} from './Types/Rules';
+import {IFieldRules, IUserRule, IUserRules, INormalizedRule, INormalizedRules, IValidatedRules} from './Types/Rules';
 
 export default class ValidationService implements IValidationService {
   private static getParams(current: IDataField, data: IDataField[], lexem: ILexem): IDataField[] {
@@ -19,7 +19,7 @@ export default class ValidationService implements IValidationService {
     }
   }
 
-  private static getUserRules(rule: INormalizedRule, userRules: IUserRules, normalizedRules: IUserRule, ruleName: string, currentField: IDataField): IUserRules {
+  private static getUsedRules(rule: INormalizedRule, userRules: IUserRules, normalizedRules: IUserRule, ruleName: string, currentField: IDataField): IUserRules {
     switch (rule.lexem.hasRules) {
       case true:
         return userRules[rule.value];
@@ -68,11 +68,11 @@ export default class ValidationService implements IValidationService {
   public validateField(currentField: IDataField, allFields: IDataField[], userRules: IUserRules): IValidatedDataField {
     let normalizedRules: INormalizedRules = ValidationService.getRules(currentField);
     let validationFlag: boolean = true;
-    let validatedRules: IFieldRules = {};
+    let validatedRules: IValidatedRules = {};
 
     for (let ruleName in normalizedRules) {
       let rule: INormalizedRule = normalizedRules[ruleName];
-      let userRule: IUserRule = ValidationService.getUserRules(rule, userRules, normalizedRules, ruleName, currentField);
+      let userRule: IUserRule = ValidationService.getUsedRules(rule, userRules, normalizedRules, ruleName, currentField);
 
       if (!userRule) {
         throw new Error("Forgot set " + rule.lexem.name + "?");
