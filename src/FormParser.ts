@@ -1,4 +1,4 @@
-import {IFieldRules} from './Types/Rules';
+import {IFieldRule} from './Types/Rules';
 import Validator from './Validator';
 
 export default class FormParser {
@@ -16,24 +16,25 @@ export default class FormParser {
     return inputs;
   }
 
-  public static getInputRules(input: HTMLInputElement): IFieldRules {
-    let rules: IFieldRules = {};
-    let rulesCount: number = 0;
+  public static getInputRules(input: HTMLInputElement): IFieldRule[] {
+    let rules: IFieldRule[] = [];
     let rulesPrefixes = Validator.getValidatorPrefixes();
 
 
-    for (let rule in input.dataset) {
+    for (let ruleName in input.dataset) {
       let isRule :boolean = rulesPrefixes.some((value: string) => {
-        return rule.substr(0, value.length) == value;
+        return ruleName.substr(0, value.length) == value;
       });
 
       if (isRule) {
-        rules[rule] = input.dataset[rule];
-        rulesCount++;
+        rules.push({
+            name: ruleName,
+          value: input.dataset[ruleName],
+        });
       }
     }
 
-    if (rulesCount == 0) {
+    if (rules.length == 0) {
       return null;
     }
 

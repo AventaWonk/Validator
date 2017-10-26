@@ -1,18 +1,34 @@
 import {IDataField, IValidatedDataField} from './Types/Fields';
-import {IUserRules} from './Types/Rules';
+import {IUserRules, IUserRule, IFieldRule} from './Types/Rules';
 import {lexSpace} from './Settings';
 import IValidationService from './Interfaces/IValidationService'
 
 export default class Validator {
   private validationService: IValidationService;
+  private userRules: IUserRules;
 
-  constructor(validationService: IValidationService) {
+  constructor(validationService: IValidationService, userRules: IUserRules) {
     this.validationService = validationService;
+    this.userRules = userRules;
   }
 
-  public validateOne(currentField: IDataField, data: IDataField[], rules: IUserRules): IValidatedDataField {
+  private getUserRule(fieldRule: IFieldRule): IUserRule {
+    return this.userRules[fieldRule.name];
+  }
+
+
+  public validateOne(currentField: IDataField, allFields: IDataField[]): IValidatedDataField {
+    if (!currentField.fieldRules) {
+      return;
+    }
+
+    let unimplementedRules: any[] = [];
     try {
-      return this.validationService.validateField(currentField, data, rules);
+      for (let i = 0; i < currentField.fieldRules.length; i++) {
+          let usedRule: IUserRule = this.getUserRule(currentField.fieldRules[i]);
+          let ruleValidity: boolean = this.validationService.checkRuleValidity(usedRule, currentField, allFields);
+          unimplementedRules.push(usedRule);
+      }
     } catch (e) {
       console.error(e.message);
       throw new Error("Validation failed");
@@ -24,12 +40,8 @@ export default class Validator {
 
     try {
       for (let i = 0; i < data.length; i++) {
-        if (!data[i].fieldRules) {
-          continue;
-        }
-
         validatedData.push(
-          this.validationService.validateField(data[i], data, rules)
+          this.validateOne(data[i], data)
         );
       }
     } catch (e) {
