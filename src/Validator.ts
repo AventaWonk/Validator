@@ -16,6 +16,38 @@ export default class Validator {
     return this.userRules[fieldRule.name];
   }
 
+  private getGeneralRule(fieldRule: IFieldRule): IUserRule {
+    // let userRule: IUserRule = {};
+    // let normalizedRuleName = ruleName.charAt(0).toLowerCase() + ruleName.slice(1);
+    // userRule[normalizedRuleName] = {
+    //   currentField: currentField,
+    //   value: normalizedRules[ruleName].value,
+    // };
+    // return userRule;
+
+    let emulatedUserRule: IUserRule = {};
+    let conditionName: string = fieldRule.name;
+    let conditionParam: string = fieldRule.value;
+
+    emulatedUserRule[conditionName] = conditionParam;
+
+    return emulatedUserRule;
+  }
+
+  private getUsedRule(fieldRule: IFieldRule): IUserRules {
+    let lexem: any = lexSpace[fieldRule.prefix];
+
+    if (!lexem) {
+      throw new Error("Bad prefix!");
+    }
+
+    switch (lexem.hasRules) {
+      case true:
+        return this.getUserRule(fieldRule);
+      case false:
+        return this.getGeneralRule(fieldRule);
+    }
+  }
 
   public validateOne(currentField: IDataField, allFields: IDataField[]): IValidatedDataField {
     if (!currentField.fieldRules) {
@@ -25,9 +57,16 @@ export default class Validator {
     let unimplementedRules: any[] = [];
     try {
       for (let i = 0; i < currentField.fieldRules.length; i++) {
-          let usedRule: IUserRule = this.getUserRule(currentField.fieldRules[i]);
-          let ruleValidity: boolean = this.validationService.checkRuleValidity(usedRule, currentField, allFields);
+        let usedRule: IUserRule = this.getUsedRule(currentField.fieldRules[i]);
+
+        if (!usedRule) {
+          throw new Error("Forgot set rule?");
+        }
+
+        let isRuleValid: boolean = this.validationService.checkRuleValidity(usedRule, currentField, allFields); /* @TODO ADD TARGET PARAM */
+        if (!isRuleValid) {
           unimplementedRules.push(usedRule);
+        }
       }
     } catch (e) {
       console.error(e.message);

@@ -1,3 +1,4 @@
+
 import {IFieldRule} from './Types/Rules';
 import Validator from './Validator';
 
@@ -22,14 +23,21 @@ export default class FormParser {
 
 
     for (let ruleName in input.dataset) {
-      let isRule :boolean = rulesPrefixes.some((value: string) => {
-        return ruleName.substr(0, value.length) == value;
-      });
+      let prefix: string = null;
 
-      if (isRule) {
+
+      rulesPrefixes.forEach(value => {
+        if (ruleName.substr(0, value.length) == value) {
+          prefix = value;
+          // return;
+        }
+      })
+
+      if (prefix) {
         rules.push({
-            name: ruleName,
+          name: ruleName,
           value: input.dataset[ruleName],
+          prefix: prefix,
         });
       }
     }
